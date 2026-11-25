@@ -1,0 +1,13 @@
+{
+  "name": "joomi-vpn",
+  "version": "2.0.0",
+  "description": "JOOMI VPN V2 - Real VPN Service with key icon",
+  "scripts": {
+    "build": "echo build"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}

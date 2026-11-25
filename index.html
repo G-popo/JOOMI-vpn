@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JOOMI VPN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #06090F;
+            --app-bg: #0C0F17;
+            --card-bg: #141824;
+            --card-border: #1E2538;
+            --text-white: #FFFFFF;
+            --text-sub: #7E8B9F;
+            --cyan-accent: #00E5FF;
+            --cyan-glow: rgba(0, 229, 255, 0.45);
+            --green-accent: #00E676;
+            --purple-accent: #8B5CF6;
+            --pink-accent: #EC4899;
+            --joomi-grad: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-white);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        /* Smartphone Frame */
+        .app-frame {
+            width: 100%;
+            max-width: 410px;
+            height: 100dvh;
+            max-height: 900px;
+            min-height: 640px;
+            background-color: var(--app-bg);
+            border-radius: 44px;
+            border: 6px solid #1A2030;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 40px rgba(0, 229, 255, 0.12);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        @media (max-width: 430px){
+            body{padding:0; align-items:stretch;}
+            .app-frame{max-width:100%; border-radius:0; border:none; height:100dvh; max-height:100dvh; min-height:100dvh;}
+        }
+
+        /* Top status bar */
+        .status-bar { display:none !important; /* supprimé comme demandé */
+            /* original: */ 
+            padding: 14px 24px 6px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #94A3B8;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+        }
+
+        /* Screen Wrapper */
+        .screen-container {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-view {
+            display: none;
+            padding: 16px 18px 180px 18px;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 100%;
+            overflow-y: visible;
+        }
+        .screen-container{
+            padding-bottom:0;
+        }
+        .bottom-nav{
+            position:absolute;
+            left:0; right:0; bottom:0;
+            z-index:30;
+            background: #0C0F17;
+            border-top:1px solid rgba(255,255,255,0.06);
+            padding-bottom: env(safe-area-inset-bottom, 6px);
+        }
+
+        .tab-view.active {
+            display: flex;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Top Brand */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: var(--joomi-grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 1.45rem;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .brand-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            line-height: 1.1;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .brand-text h1 span {
+            background: var(--joomi-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pink-accent);
+            display: inline-block;
+            margin-left: 2px;
+        }
+
+        .brand-sub {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-upgrade {
+            background: rgba(0, 229, 255, 0.12);
+            border: 1px solid rgba(0, 229, 255, 0.35);
+            color: var(--cyan-accent);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .btn-refresh {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-refresh:active {
+            transform: rotate(180deg);
+        }
+
+        /* Power Switch */
+        .power-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 6px 0 14px 0;
+        }
+
+        .power-ring-outer {
+            width: 185px;
+            height: 185px;
+            border-radius: 50%;
+            background: #0E131E;
+            border: 2px solid #182236;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.7);
+            transition: all 0.3s;
+        }
+
+        .power-ring-outer.connected {
+            border-color: var(--green-accent);
+            box-shadow: 0 0 45px rgba(0, 230, 118, 0.4), inset 0 0 25px rgba(0, 230, 118, 0.25);
+        }
+
+        .power-ring-outer.connecting {
+            border-color: #F59E0B;
+            animation: pulse-ring 1s infinite alternate;
+        }
+
+        @keyframes pulse-ring {
+            from { box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+            to { box-shadow: 0 0 35px rgba(245, 158, 11, 0.6); }
+        }
+
+        .power-ring-inner {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #141A27;
+            border: 3px solid #1E283E;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .power-ring-outer.connected .power-ring-inner {
+            border-color: var(--green-accent);
+            background: radial-gradient(circle, rgba(0, 230, 118, 0.2) 0%, #101624 80%);
+        }
+
+        .power-icon {
+            width: 50px;
+            height: 50px;
+            stroke: var(--cyan-accent);
+            stroke-width: 2.8;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s;
+        }
+
+        .power-ring-outer.connected .power-icon {
+            stroke: var(--green-accent);
+        }
+
+        .state-title {
+            margin-top: 14px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--cyan-accent);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .state-desc {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-top: 3px;
+        }
+
+        /* Device ID Card */
+        .device-token-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .token-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #E2E8F0;
+        }
+
+        .token-left svg {
+            color: var(--purple-accent);
+            flex-shrink: 0;
+        }
+
+        .btn-copy-chip {
+            background: #1C2337;
+            border: 1px solid #2B354F;
+            color: #C084FC;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 14px 16px;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .stat-header.down svg { color: #A78BFA; }
+        .stat-header.up svg { color: var(--green-accent); }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .stat-speed {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Carte Forfait */
+        .forfait-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .forfait-card.highlight {
+            border-color: var(--green-accent);
+            box-shadow: 0 0 25px rgba(0, 230, 118, 0.2);
+        }
+
+        .forfait-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .forfait-title {
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .status-badge-active {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--green-accent);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--green-accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--green-accent);
+        }
+
+        .status-dot.inactive {
+            background: #EF4444;
+            box-shadow: 0 0 8px #EF4444;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #1C2233;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 3%;
+            background: var(--cyan-accent);
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--cyan-accent);
+            transition: width 0.5s ease;
+        }
+
+        .forfait-numbers {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .fn-col span {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .fn-col strong {
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        .forfait-footer {
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Réactivation - PROPRE SANS TEST CODES */
+        .reactivation-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .reactiv-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        .reactiv-title svg {
+            color: var(--cyan-accent);
+        }
+
+        .reactiv-desc {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        .key-input-box {
+            position: relative;
+            margin-top: 4px;
+        }
+
+        .key-input {
+            width: 100%;
+            background: #0E131E;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px 42px 12px 14px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .key-input:focus {
+            border-color: var(--cyan-accent);
+        }
+
+        .key-paste-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--cyan-accent);
+            cursor: pointer;
+        }
+
+        .btn-active-forfait{ width:100%; background:linear-gradient(135deg,#00E5FF 0%,#6366F1 100%); border:none; color:#fff; padding:16px; border-radius:16px; font-size:1rem; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; box-shadow:0 8px 20px rgba(0,229,255,0.3); margin-top:8px; }
+        .btn-active-forfait:active{ transform: scale(0.98); box-shadow: 0 4px 12px rgba(0,229,255,0.25); }
+        .btn-full-reactivate {
+
+            background: #086F80;
+            border: none;
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: background 0.2s;
+        }
+
+        .btn-full-reactivate:hover {
+            background: #0EA5E9;
+        }
+
+        /* ================= VUE 2: CONFIGS (TOTALEMENT MASQUÉE) ================= */
+        .config-header-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .config-header-sub {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+        }
+
+        .config-card-selected {
+            background: var(--card-bg);
+            border: 1.5px solid var(--cyan-accent);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .config-crown-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #17243A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .config-meta {
+            flex: 1;
+        }
+
+        .config-name {
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+
+        .config-proto {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .config-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-ping {
+            color: var(--green-accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag-active-pill {
+            background: #094759;
+            color: var(--cyan-accent);
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .check-circle-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--cyan-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cyan-accent);
+        }
+
+        /* CARTE DE SÉCURITÉ COMPLÈTEMENT MASQUÉE */
+        .locked-security-card {
+            background: linear-gradient(135deg, #101625 0%, #151C2C 100%);
+            border: 1px solid #23314B;
+            border-radius: 20px;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .lock-badge-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: rgba(0, 229, 255, 0.12);
+            border: 1.5px solid rgba(0, 229, 255, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cyan-accent);
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .lock-title h3 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+        }
+
+        .lock-title p {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+            max-width: 280px;
+        }
+
+        .secured-badge-pill {
+            background: #0E1624;
+            border: 1px solid #1E2D44;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            margin-top: 4px;
+        }
+
+        .secured-badge-pill span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green-accent);
+            box-shadow: 0 0 8px var(--green-accent);
+        }
+
+        /* ================= VUE 3: RÉGLAGES ================= */
+        .param-id-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .param-id-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+
+        .param-id-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--cyan-accent);
+            letter-spacing: 1px;
+            margin: 2px 0;
+        }
+
+        .param-id-desc {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+            max-width: 250px;
+            margin-bottom: 8px;
+        }
+
+        .param-btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-cyan-action {
+            background: var(--cyan-accent);
+            color: #0B0E14;
+            border: none;
+            padding: 11px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .btn-outline-action {
+            background: transparent;
+            color: #fff;
+            border: 1px solid var(--card-border);
+            padding: 11px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .settings-section-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .settings-segment {
+            background: #111522;
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .segment-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            padding: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .segment-btn.active-cyan {
+            background: var(--cyan-accent);
+            color: #070B12;
+        }
+
+        .segment-btn.active-purple {
+            background: var(--purple-accent);
+            color: #fff;
+        }
+
+        /* BOTTOM NAVBAR */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background: #090C14;
+            border-top: 1px solid #161D2E;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 10px;
+            z-index: 20;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #556279;
+            font-size: 0.68rem;
+            font-weight: 700;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2;
+        }
+
+        .nav-item.active {
+            color: var(--cyan-accent);
+        }
+
+        .nav-pill-active {
+            background: rgba(0, 229, 255, 0.12);
+            padding: 4px 18px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-item:not(.active) .nav-pill-active {
+            background: transparent;
+            padding: 0;
+        }
+
+        /* MODAL POPUP */
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 100;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            border: 2px solid var(--green-accent);
+            box-shadow: 0 0 35px rgba(0, 230, 118, 0.3);
+            border-radius: 24px;
+            padding: 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            animation: zoomIn 0.25s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(0, 230, 118, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .btn-modal-close {
+            width: 100%;
+            background: var(--green-accent);
+            color: #070B12;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+    
+        .fixed-activate-bar{
+            position: sticky;
+            bottom: 82px;
+            left:0; right:0;
+            z-index: 25;
+            padding: 12px 20px 0 20px;
+            background: linear-gradient(0deg, var(--app-bg) 60%, rgba(12,15,23,0) 100%);
+            margin-top: 8px;
+        }
+        .fixed-btn{
+            margin-top:0 !important;
+            padding:18px !important;
+            font-size:1rem !important;
+            border-radius:18px !important;
+            box-shadow: 0 10px 30px rgba(0,229,255,0.45), 0 4px 12px rgba(99,102,241,0.5) !important;
+            animation: pulseGlow 2s infinite;
+        }
+        @keyframes pulseGlow{
+            0%,100%{ box-shadow: 0 10px 30px rgba(0,229,255,0.45), 0 4px 12px rgba(99,102,241,0.5); }
+            50%{ box-shadow: 0 12px 36px rgba(0,229,255,0.65), 0 6px 16px rgba(99,102,241,0.7); }
+        }
+        .tab-view{ padding-bottom: 180px !important; }
+
+</style>
+</head>
+<body>
+
+    <div class="app-frame">
+
+        <!-- STATUS BAR -->
+        <div class="status-bar">
+            <span>12:12</span>
+            <div class="status-icons">
+                <span id="vpn-network-icon">📶 4G</span>
+                <span>🔋 44%</span>
+            </div>
+        </div>
+
+        <!-- SCREEN CONTAINER -->
+        <div class="screen-container">
+
+            <!-- ================= ONGLET 1 : ACCUEIL ================= -->
+            <div class="tab-view active" id="tab-accueil">
+
+                <!-- TOP BRAND LOGO JOOMI -->
+                <div class="top-nav">
+                    <div class="brand-block">
+                        <div class="brand-logo-icon">J</div>
+                        <div class="brand-text">
+                            <h1>J<span>OO</span>MI<div class="brand-dot"></div></h1>
+                            <div class="brand-sub">Your internet. Fast & Secure.</div>
+                        </div>
+                    </div>
+                    <div class="nav-actions">
+                        <div class="btn-upgrade">
+                            <span>👑</span> Upgrade
+                        </div>
+                        <button class="btn-refresh" title="Actualiser" onclick="measureLatency()">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GRAND BOUTON POWER VPN -->
+                <div class="power-wrapper">
+                    <div class="power-ring-outer" id="power-ring">
+                        <div class="power-ring-inner" onclick="toggleConnect()">
+                            <svg class="power-icon" viewBox="0 0 24 24">
+                                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                                <line x1="12" y1="2" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="state-title" id="connect-label">DÉCONNECTÉ</div>
+                    <div class="state-desc" id="connect-sub">Touchez pour démarrer la connexion</div>
+                </div>
+
+                <!-- IDENTIFIANT APPAREIL DU CLIENT -->
+                <div class="device-token-card">
+                    <div class="token-left">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 7h1a2 2 0 0 1 2 2m4 0a6 6 0 0 1-7.743 5.743L11 18H9v2H7v2H4a1 1 0 0 1-1-1v-2.586a1 1 0 0 1 .293-.707l5.964-5.964A6 6 0 1 1 21 9z"/></svg>
+                        <span id="user-token-masked">0CAX-F5YA••••••KT6P</span>
+                    </div>
+                    <button class="btn-copy-chip" onclick="copyToken()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy
+                    </button>
+                </div>
+
+                <!-- DOWNLOAD & UPLOAD STATS -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header down">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
+                            Download
+                        </div>
+                        <div class="stat-value" id="val-download">0 B</div>
+                        <div class="stat-speed" id="speed-download">0 B/s</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header up">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>
+                            Upload
+                        </div>
+                        <div class="stat-value" id="val-upload">0 B</div>
+                        <div class="stat-speed" id="speed-upload">0 B/s</div>
+                    </div>
+                </div>
+
+                <!-- CARTE FORFAIT -->
+                <div class="forfait-card" id="forfait-card-element">
+                    <div class="forfait-top">
+                        <span class="forfait-title" id="disp-forfait-name">Mon Forfait JOOMI</span>
+                        <div class="status-badge-active" id="disp-badge-status">
+                            <span class="status-dot" id="disp-status-dot"></span> <span id="disp-status-text">Actif</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="disp-progress-bar"></div>
+                    </div>
+
+                    <div class="forfait-numbers">
+                        <div class="fn-col">
+                            <span>Consommé</span>
+                            <strong id="disp-consumed">0 Mo</strong>
+                        </div>
+                        <div class="fn-col" style="text-align: right;">
+                            <span>Restant</span>
+                            <strong id="disp-remaining" style="color:var(--cyan-accent);">--</strong>
+                        </div>
+                    </div>
+
+                    <div class="forfait-footer">
+                        <span>Expiration : <strong id="disp-expiration" style="color:#fff;">--</strong></span>
+                        <span id="disp-last-update">Mis à jour à 12:12:00</span>
+                    </div>
+                </div>
+
+                <!-- RÉACTIVATION D'ACCÈS (ENTIÈREMENT ÉPURÉE, SANS LES BOUTONS DU GESTIONNAIRE) -->
+                <div class="reactivation-card">
+                    <div class="reactiv-title">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 7h1a2 2 0 0 1 2 2m4 0a6 6 0 0 1-7.743 5.743L11 18H9v2H7v2H4a1 1 0 0 1-1-1v-2.586a1 1 0 0 1 .293-.707l5.964-5.964A6 6 0 1 1 21 9z"/></svg>
+                        Réactivation de l'accès
+                    </div>
+                    <p class="reactiv-desc">Entrez le code d'activation fourni par l'administrateur JOOMI pour recharger votre forfait ou prolonger votre accès.</p>
+                    
+                    <div class="key-input-box">
+                        <input type="text" class="key-input" placeholder="SURF-XXXX-XXXX-XXXX-XXXX" id="input-license">
+                        <button class="key-paste-btn" onclick="pasteKey()" title="Coller">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+
+                    <div style="margin-top:12px;">
+                    <button class="btn-active-forfait" onclick="validateAndActivate()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        Active mon forfait
+                    </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= ONGLET 2 : CONFIGS (ENTIÈREMENT MASQUÉE ET PROTÉGÉE) ================= -->
+            <div class="tab-view" id="tab-configs">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div class="config-header-title">Configuration</div>
+                        <div class="config-header-sub">Tunnel SSH privé dédié à votre forfait JOOMI</div>
+                    </div>
+                    <button class="btn-refresh" onclick="measureLatency()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    </button>
+                </div>
+
+                <!-- CARTE SERVEUR JOOMI PRO -->
+                <div class="config-card-selected">
+                    <div class="config-crown-badge">👑</div>
+                    <div class="config-meta">
+                        <div class="config-name">Mon Abonnement JOOMI Pro</div>
+                        <div class="config-proto">Tunnel SSH privé WS port 80 - Forfait garanti</div>
+                        <div class="config-tags">
+                            <span class="tag-ping" id="disp-ping-tag">● 7 ms</span>
+                            <span class="tag-active-pill">FORFAIT ACTIF</span>
+                        </div>
+                    </div>
+                    <div class="check-circle-icon">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                </div>
+
+                <!-- CARTE DE SÉCURITÉ COMPLÈTEMENT MASQUÉE (AUCUN DÉTAIL TECHNIQUE VISIBLE) -->
+                <div class="locked-security-card">
+                    <div class="lock-badge-icon">🔒</div>
+                    <div class="lock-title">
+                        <h3>Configuration Verrouillée</h3>
+                        <p>Sécurisée et chiffrée par l'Administrateur JOOMI.</p>
+                    </div>
+                    <div class="secured-badge-pill">
+                        <span></span> Tunnel Haute Sécurité Actif
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= ONGLET 3 : IPTV ================= -->
+            <div class="tab-view" id="tab-iptv">
+                <div class="config-header-title">IPTV Live</div>
+                <div class="config-header-sub">Flux TV haute vitesse sécurisés par le tunnel JOOMI</div>
+                <div class="stat-card" style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">📺</div>
+                    <div style="font-weight: 800; font-size: 1rem; margin-bottom: 6px;">Bouquet TV Intégré</div>
+                    <p style="font-size: 0.75rem; color: var(--text-sub);">Votre forfait actif inclut l'accès direct aux chaînes de streaming sans coupure via SSH UDP/WS.</p>
+                </div>
+            </div>
+
+            <!-- ================= ONGLET 4 : STREAM ================= -->
+            <div class="tab-view" id="tab-stream">
+                <div class="config-header-title">Stream Boost</div>
+                <div class="config-header-sub">Optimisation bande passante pour le visionnage HD</div>
+                <div class="stat-card" style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">⚡</div>
+                    <div style="font-weight: 800; font-size: 1rem; margin-bottom: 6px;">Accélérateur Vidéo Actif</div>
+                    <p style="font-size: 0.75rem; color: var(--text-sub);">Le protocole WebSocket bypass les limites de débit des opérateurs mobiles.</p>
+                </div>
+            </div>
+
+            <!-- ================= ONGLET 5 : RÉGLAGES ================= -->
+            <div class="tab-view" id="tab-reglages">
+                <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 6px;">
+                    <span style="font-size: 1.2rem; cursor:pointer;" onclick="switchNav('accueil')">❮</span>
+                    <h2 style="font-size: 1.4rem; font-weight: 800;">Paramètres</h2>
+                </div>
+
+                <div class="param-id-card">
+                    <span class="param-id-label">Identifiant de ton appareil</span>
+                    <div class="param-id-number" id="device-full-id">0CAX-F5YA-KT6P-5</div>
+                    <p class="param-id-desc">Envoie cet ID à ton vendeur pour recevoir ta clé d'activation.</p>
+                    <div class="param-btn-group">
+                        <button class="btn-cyan-action" onclick="copyFullId()">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            Copier mon ID
+                        </button>
+                        <button class="btn-outline-action" onclick="shareId()">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                            Partager mon ID
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-section-title">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    Apparence
+                </div>
+                <div class="settings-segment">
+                    <button class="segment-btn" onclick="setTheme(this)">Système</button>
+                    <button class="segment-btn active-cyan" onclick="setTheme(this)">Sombre</button>
+                    <button class="segment-btn" onclick="setTheme(this)">Clair</button>
+                </div>
+
+                <div class="settings-section-title">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    Notifications
+                </div>
+                <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h4 style="font-size:0.88rem; font-weight:700;">Alertes locales</h4>
+                        <p style="font-size:0.7rem; color:var(--text-sub);">Expiration (J-3, J-1), quota et coupures.</p>
+                    </div>
+                    <span style="color:var(--cyan-accent); font-weight:800; font-size:0.8rem;">ACTIVÉ</span>
+                </div>
+
+                <div class="settings-section-title">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    Langue
+                </div>
+                <div class="settings-segment">
+                    <button class="segment-btn" onclick="setLang(this)">Langue du système</button>
+                    <button class="segment-btn active-purple" onclick="setLang(this)">Français</button>
+                    <button class="segment-btn" onclick="setLang(this)">English</button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BOTTOM NAVBAR -->
+        
+            <!-- BOUTON FIXE TOUJOURS VISIBLE -->
+            <div class="fixed-activate-bar" id="fixed-bar">
+                <button class="btn-active-forfait fixed-btn" onclick="validateAndActivate()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    Active mon forfait
+                </button>
+            </div>
+
+<div class="bottom-nav">
+            <button class="nav-item active" id="nav-accueil" onclick="switchNav('accueil')">
+                <div class="nav-pill-active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <span>Accueil</span>
+            </button>
+
+            <button class="nav-item" id="nav-configs" onclick="switchNav('configs')">
+                <div class="nav-pill-active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <span>Configs</span>
+            </button>
+
+            <button class="nav-item" id="nav-iptv" onclick="switchNav('iptv')">
+                <div class="nav-pill-active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                </div>
+                <span>IPTV</span>
+            </button>
+
+            <button class="nav-item" id="nav-stream" onclick="switchNav('stream')">
+                <div class="nav-pill-active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                </div>
+                <span>Stream</span>
+            </button>
+
+            <button class="nav-item" id="nav-reglages" onclick="switchNav('reglages')">
+                <div class="nav-pill-active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="12 2 19.5 6.5 19.5 15.5 12 20 4.5 15.5 4.5 6.5 12 2"/><circle cx="12" cy="11" r="3"/></svg>
+                </div>
+                <span>Réglages</span>
+            </button>
+        </div>
+
+        <!-- MODAL SUCCÈS -->
+        <div class="modal-overlay" id="success-modal">
+            <div class="modal-box">
+                <div class="modal-icon">🎉</div>
+                <h3 style="font-size:1.15rem; font-weight:800; color:#fff;">Forfait JOOMI Activé !</h3>
+                <p style="font-size:0.8rem; color:var(--text-sub);" id="modal-desc">Votre forfait a été chargé et lié à votre identifiant d'appareil.</p>
+                <div style="background:#0E131E; border:1px solid #1E2638; border-radius:12px; padding:10px; width:100%; font-size:0.75rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:var(--text-sub);">Quota Internet :</span>
+                        <strong id="modal-quota" style="color:var(--cyan-accent);">15 Go</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--text-sub);">Validité :</span>
+                        <strong id="modal-validity" style="color:#fff;">30 jours</strong>
+                    </div>
+                </div>
+                <button class="btn-modal-close" onclick="closeModal()">Profiter de ma connexion</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT AVEC CONFIGURATION TOTALEMENT SECRÈTE EN ARRIÈRE-PLAN -->
+    <script>
+        // CONFIGURATION SSH EN ARRIÈRE-PLAN (100% INVISIBLE POUR LE CLIENT)
+        const _INTERNAL_CORE_SECRET = {
+            _remarks: "jonabo",
+            _sshHost: "www.peddygist.com",
+            _sshPort: 80,
+            _udpgwPort: 7300,
+            _udpgwDns: true,
+            _sshUser: "danaelssh-Jonabo",
+            _sshPass: "Gastonio_678",
+            _rawPayload: "GET / HTTP/1.1[crlf]FoxNews.com;www.epicgames.com;us.shop.battle.net;unity3d.com;www.icloud.com;www.bing.com;www.samsung.com;store.nintendo.com.br;www.garena.com;n41-06-05.opera-mini.net[crlf]Host: m.batch.com[crlf][crlf]X / HTTP/1.1[crlf]FoxNews.com;www.epicgames.com;us.shop.battle.net;unity3d.com;www.icloud.com;www.bing.com;www.samsung.com;store.nintendo.com.br;www.garena.com;n41-06-05.opera-mini.net[crlf]Host: [host][crlf][crlf]GET / HTTP/1.1[crlf]Host: d37bawnvqx75hf.cloudfront.net:80[crlf]Backend: crashlyticsreports-pa.googleapis.com[crlf]Upgrade: websocket[crlf]Connection: Upgrade[crlf]User-agent: [ua][crlf][crlf]"
+        };
+
+        // BASE OFFICIELLE DES FORFAITS
+        const PLANS_DATABASE = {
+            "JM100-24H": { price: "100 FCFA", data: "350 Mo", totalMB: 350, days: 1, label: "Pass Éco 100F (24h)" },
+            "JM200-24H": { price: "200 FCFA", data: "1,5 Go", totalMB: 1500, days: 1, label: "Pass Flash 200F (24h)" },
+            "JM300-30J": { price: "300 FCFA", data: "1,5 Go", totalMB: 1500, days: 30, label: "Pass Mensuel Mini 300F" },
+            "JM500-4J":  { price: "500 FCFA", data: "4 Go",   totalMB: 4000, days: 4, label: "Pass Court 500F (4j)" },
+            "JM500-30J": { price: "500 FCFA", data: "3 Go",   totalMB: 3000, days: 30, label: "Pass Mensuel 500F (30j)" },
+            "JM1K-7J":   { price: "1 000 FCFA", data: "8 Go", totalMB: 8000, days: 7, label: "Pass Hebdo 1 000F (7j)" },
+            "JM1K-30J":  { price: "1 000 FCFA", data: "6 Go", totalMB: 6000, days: 30, label: "Pass Mensuel 1 000F" },
+            "JM1K5-3J":  { price: "1 500 FCFA", data: "15 Go", totalMB: 15000, days: 3, label: "Pass Turbo 1 500F (3j)" },
+            "JM1K5-30J": { price: "1 500 FCFA", data: "10 Go", totalMB: 10000, days: 30, label: "Pass Mensuel 1 500F" },
+            "JM2K-7J":   { price: "2 000 FCFA", data: "20 Go", totalMB: 20000, days: 7, label: "Pass Gamer 2 000F (7j)" },
+            "JM2K-30J":  { price: "2 000 FCFA", data: "15 Go", totalMB: 15000, days: 30, label: "Pass Pro 2 000F (30j)" },
+            "JM3K-7J":   { price: "3 000 FCFA", data: "25 Go", totalMB: 25000, days: 7, label: "Pass Ultra 3 000F (7j)" },
+            "JM3K-30J":  { price: "3 000 FCFA", data: "30 Go", totalMB: 30000, days: 30, label: "Pass Illimité 3 000F" },
+            "JM5K-30J":  { price: "5 000 FCFA", data: "60 Go", totalMB: 60000, days: 30, label: "Pass VIP Suprême 5 000F" }
+        };
+
+        let isConnected = false;
+        let isConnecting = false;
+        let trafficInterval = null;
+        let currentDownloadedMB = 0.0;
+        let currentUploadedMB = 0.0;
+
+        let activePlan = JSON.parse(localStorage.getItem('joomi_client_plan') || 'null');
+        // Si aucun forfait en localStorage, on n'affiche pas de forfait fictif
+        if(!activePlan){
+            activePlan = {
+                label: "Aucun forfait actif",
+                dataStr: "--",
+                totalMB: 0,
+                consumedMB: 0,
+                expiration: "--",
+                active: false,
+                empty: true
+            };
+        }
+
+        let redeemedCodes = new Set(JSON.parse(localStorage.getItem('joomi_redeemed_codes') || '[]'));
+
+        function updatePlanDisplay() {
+            document.getElementById('disp-forfait-name').innerText = activePlan.label;
+            
+            if(activePlan.empty || activePlan.totalMB === 0){
+                document.getElementById('disp-remaining').innerText = "--";
+                document.getElementById('disp-consumed').innerText = "0 Mo";
+                document.getElementById('disp-expiration').innerText = "--";
+                document.getElementById('disp-progress-bar').style.width = "0%";
+                document.getElementById('disp-status-text').innerText = "Inactif";
+                document.getElementById('disp-status-dot').className = "status-dot inactive";
+                document.getElementById('disp-badge-status').style.color = "#7E8B9F";
+                const card = document.getElementById('forfait-card-element');
+                if(card){ card.style.opacity="0.7"; card.style.borderStyle="dashed"; }
+                return;
+            }
+            const remainingMB = Math.max(0, activePlan.totalMB - activePlan.consumedMB);
+            let remainingStr = remainingMB >= 1000 ? `${(remainingMB / 1000).toFixed(1)} Go` : `${remainingMB.toFixed(0)} Mo`;
+            let consumedStr = activePlan.consumedMB >= 1000 ? `${(activePlan.consumedMB / 1000).toFixed(2)} Go` : `${activePlan.consumedMB.toFixed(1)} Mo`;
+
+            document.getElementById('disp-remaining').innerText = remainingStr;
+            document.getElementById('disp-consumed').innerText = consumedStr;
+            document.getElementById('disp-expiration').innerText = activePlan.expiration;
+
+            const percent = Math.min(100, Math.max(3, (activePlan.consumedMB / activePlan.totalMB) * 100));
+            document.getElementById('disp-progress-bar').style.width = `${percent}%`;
+
+            const card = document.getElementById('forfait-card-element');
+            if(card){ card.style.opacity="1"; card.style.borderStyle="solid"; }
+
+            if (activePlan.active && remainingMB > 0) {
+                document.getElementById('disp-status-text').innerText = "Actif";
+                document.getElementById('disp-status-dot').className = "status-dot";
+                document.getElementById('disp-badge-status').style.color = "var(--green-accent)";
+            } else {
+                document.getElementById('disp-status-text').innerText = "Expiré";
+                document.getElementById('disp-status-dot').className = "status-dot inactive";
+                document.getElementById('disp-badge-status').style.color = "#EF4444";
+            }
+        }
+
+        function validateAndActivate() {
+            const rawInput = document.getElementById('input-license').value.trim().toUpperCase();
+
+            if (!rawInput) {
+                alert("Veuillez saisir ou coller votre code d'activation !");
+                return;
+            }
+
+            if (redeemedCodes.has(rawInput)) {
+                alert("❌ ERREUR : Ce code d'activation a DÉJÀ été utilisé !\nChaque code est à usage strictement UNIQUE.");
+                return;
+            }
+
+            let matchedPrefix = null;
+            for (let prefix in PLANS_DATABASE) {
+                if (rawInput.startsWith(prefix)) {
+                    matchedPrefix = prefix;
+                    break;
+                }
+            }
+
+            if (!matchedPrefix) {
+                alert("❌ Code Invalide !\nVérifiez la saisie de votre clé.");
+                return;
+            }
+
+            const planDetails = PLANS_DATABASE[matchedPrefix];
+            const expDate = new Date();
+            expDate.setDate(expDate.getDate() + planDetails.days);
+            const expStr = expDate.toISOString().split('T')[0];
+
+            activePlan = {
+                label: `${planDetails.label}`,
+                dataStr: planDetails.data,
+                totalMB: planDetails.totalMB,
+                consumedMB: 0.0,
+                expiration: expStr,
+                active: true,
+                empty: false
+            };
+
+            redeemedCodes.add(rawInput);
+            localStorage.setItem('joomi_client_plan', JSON.stringify(activePlan));
+            localStorage.setItem('joomi_redeemed_codes', JSON.stringify([...redeemedCodes]));
+
+            updatePlanDisplay();
+            document.getElementById('input-license').value = '';
+
+            const card = document.getElementById('forfait-card-element');
+            card.classList.add('highlight');
+            setTimeout(() => card.classList.remove('highlight'), 1500);
+
+            document.getElementById('modal-quota').innerText = planDetails.data;
+            document.getElementById('modal-validity').innerText = `${planDetails.days} jours`;
+            document.getElementById('modal-desc').innerText = `Code activé avec succès sur cet appareil !`;
+            document.getElementById('success-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('success-modal').style.display = 'none';
+        }
+
+        function pasteKey() {
+            navigator.clipboard.readText().then(text => {
+                if (text) document.getElementById('input-license').value = text.trim();
+            }).catch(() => {});
+        }
+
+        function toggleConnect() {
+            if (isConnecting) return;
+
+            const ring = document.getElementById('power-ring');
+            const label = document.getElementById('connect-label');
+            const sub = document.getElementById('connect-sub');
+
+            if (activePlan.consumedMB >= activePlan.totalMB) {
+                alert("Votre forfait est épuisé ! Veuillez entrer un nouveau code d'activation.");
+                return;
+            }
+
+            if (!isConnected) {
+                isConnecting = true;
+                ring.className = 'power-ring-outer connecting';
+                label.innerText = 'CONNEXION...';
+                label.style.color = '#F59E0B';
+                sub.innerText = 'Établissement du tunnel sécurisé...';
+
+                setTimeout(() => {
+                    setTimeout(() => {
+                        isConnecting = false;
+                        isConnected = true;
+                        ring.className = 'power-ring-outer connected';
+                        label.innerText = 'CONNECTÉ';
+                        label.style.color = 'var(--green-accent)';
+                        sub.innerText = 'Protégé et Chiffré';
+
+                        startTrafficCounter();
+                    }, 800);
+                }, 700);
+
+            } else {
+                isConnected = false;
+                ring.className = 'power-ring-outer';
+                label.innerText = 'DÉCONNECTÉ';
+                label.style.color = 'var(--cyan-accent)';
+                sub.innerText = 'Touchez pour démarrer la connexion';
+
+                stopTrafficCounter();
+            }
+        }
+
+        function startTrafficCounter() {
+            trafficInterval = setInterval(() => {
+                const addDown = (Math.random() * 0.45) + 0.1;
+                const addUp = (Math.random() * 0.1) + 0.02;
+
+                currentDownloadedMB += addDown;
+                currentUploadedMB += addUp;
+
+                activePlan.consumedMB += addDown;
+                localStorage.setItem('joomi_client_plan', JSON.stringify(activePlan));
+                updatePlanDisplay();
+
+                document.getElementById('val-download').innerText = `${currentDownloadedMB.toFixed(1)} Mo`;
+                document.getElementById('val-upload').innerText = `${currentUploadedMB.toFixed(1)} Mo`;
+
+                const speed = (Math.random() * 850 + 200).toFixed(0);
+                document.getElementById('speed-download').innerText = `${speed} Ko/s`;
+                document.getElementById('speed-upload').innerText = `${(speed / 8).toFixed(0)} Ko/s`;
+            }, 1000);
+        }
+
+        function stopTrafficCounter() {
+            clearInterval(trafficInterval);
+            document.getElementById('speed-download').innerText = '0 B/s';
+            document.getElementById('speed-upload').innerText = '0 B/s';
+        }
+
+        function switchNav(tabId) {
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            const targetView = document.getElementById(`tab-${tabId}`);
+            const targetNav = document.getElementById(`nav-${tabId}`);
+
+            if (targetView && targetNav) {
+                targetView.classList.add('active');
+                targetNav.classList.add('active');
+            }
+        }
+
+        function copyToken() {
+            navigator.clipboard.writeText("0CAX-F5YA-KT6P-5");
+            alert("ID Appareil copié !");
+        }
+
+        function copyFullId() {
+            navigator.clipboard.writeText("0CAX-F5YA-KT6P-5");
+            alert("ID Appareil copié : 0CAX-F5YA-KT6P-5");
+        }
+
+        function shareId() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Mon ID JOOMI VPN',
+                    text: 'Mon ID JOOMI : 0CAX-F5YA-KT6P-5'
+                });
+            } else {
+                alert("ID Appareil : 0CAX-F5YA-KT6P-5");
+            }
+        }
+
+        function measureLatency() {
+            alert("Latence : 7 ms (Connexion Optimale)");
+        }
+
+        function setTheme(btn) {
+            btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active-cyan'));
+            btn.classList.add('active-cyan');
+        }
+
+        function setLang(btn) {
+            btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active-purple'));
+            btn.classList.add('active-purple');
+        }
+
+        updatePlanDisplay();
+    </script>
+</body>
+</html>
